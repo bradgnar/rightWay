@@ -1,0 +1,15 @@
+The router dealer program is all about making the responder requester pattern more scalable in node.  It achieves this goal by creating a cluster of child nodes that handle 
+the grunt work of routing the requests to the responder. And then routing the responses back to whatever made the request.  The path or flow of the program looks like this:
+
+First however many workers you have said to create in your program get created.  Let's assume for each step in the program you are logging what you are doing because that's what 
+I did and it makes it easier to follow.  That means that when the worker gets created we get the message worker _pid_ is online.  So to start the program we get 
+
+'Worker 22747 is online'... that reqpeats through 22749
+
+After that you turn on the requester, the requester in this case is almost like a test case requester because it is pre determined to fire off 3 requests.  The requester is connected
+to the same port as the router.  So the requester sends the requests the router receives these requests as a 'message' event.  It then parses down the arguments into frames(I'm not sure what that
+part means) but basically it creates theses frames and then has the dealer send out the frames. The dealer is sending the frames to a responder in a child node.  **NOTE**:The dealer and the router
+are both created in the master node while the responder(s) are created in the child processes.  The dealer is connected to the responders via a unix socket file which looks like 
+'ipc://filer-dealer.ipc' in this case.  Once the responders get the message from the dealer they parse it down and figure out which file to read.  After they read the file they send
+a response back to the dealer which will be a 'message' event, this is again sent over a unix socket.  When the dealer receives the message it parses out the frames and then uses the router to 
+send the response back to the requester from which the request originally came from  Again the requester and the router are connected over a mutual tcp port.
