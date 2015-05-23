@@ -1,3 +1,5 @@
 */node_modules/*
-databases/node_modules/*
-messaging/node_modules/*
+/databases/node_modules/*
+/messaging/node_modules/*
+/databases/cache
+/databases/rdf-files.tar.bz2
